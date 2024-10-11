@@ -1,0 +1,106 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "My Express API",
+        "version": "1.0.0",
+        "description": "API de exemplo"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3000",
+            "description": "LOCAL HOST"
+        }
+    ],
+    "paths": {
+        "/usuarios": {
+            "post": {
+                "summary": "Criar um novo usuário",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "nome": {
+                                        "type": "string",
+                                        "example": "Cassio Ramos"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "goleirao@example.com"
+                                    }
+                                },
+                                "required": [
+                                    "nome",
+                                    "email"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Usuário criado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "nome": {
+                                            "type": "string",
+                                            "example": "Ronaldinho Gaucho"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "example": "magico@example.com"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Nome e email são obrigatórios"
+                    }
+                }
+            },
+            "get": {
+                "summary": "Obter todos os usuários",
+                "responses": {
+                    "200": {
+                        "description": "Lista de todos os usuários",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "nome": {
+                                                "type": "string",
+                                                "example": "Ronaldinho Gaucho"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "example": "magico@example.com"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
