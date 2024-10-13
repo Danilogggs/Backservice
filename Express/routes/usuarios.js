@@ -1,28 +1,13 @@
 import express from 'express';
+import { UserController } from '../Controller/UserController.js';
+
 const router = express.Router();
 
-let usuarios = [];
-
-router.post('/', (request, response) => {
-    const { nome, email } = request.body;
-
-    if (!nome || !email) {
-        return response.status(400).send('Nome e email são obrigatórios');
-    }
-
-    const criarUser = {
-        id: usuarios.length + 1,
-        nome,
-        email
-    };
-
-    usuarios.push(criarUser);
-
-    response.status(201).json(criarUser);
-});
-
-router.get('/', (request, response) => {
-    response.status(200).json(usuarios);
-});
+// métodos
+router.post('/', UserController.createUser);
+router.get('/', UserController.listUsers);
+router.get('/:id', UserController.findUserById);
+router.put('/:id', UserController.updateUser);
+router.delete('/:id', UserController.deleteUser);
 
 export default router;

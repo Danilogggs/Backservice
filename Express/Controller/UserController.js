@@ -1,14 +1,16 @@
-import CreateUserRequest from '../models/CreateUserRequest.js';
-import UpdateUserRequest from '../models/UpdateUserRequest.js';
-import UserResponse from '../models/UserResponse.js';
+import CreateUser from '../Models/CreateUser.js';
+import UpdateUser from '../Models/UpdateUser.js';
+import UserResponse from '../Models/UserResponse.js';
+import express from 'express';
 
+const router = express.Router();
 let usuarios = [];
 
 class UserController {
     static createUser(req, res) {
         try {
-            const createUserRequest = new CreateUserRequest(req.body.nome, req.body.email, req.body.password);
-            const user = createUserRequest.toUser();
+            const createUser = new CreateUser(req.body.nome, req.body.email, req.body.password);
+            const user = createUser.toUser();
 
             const existingUser = usuarios.find(u => u.email === user.email);
             if (existingUser) {
@@ -38,13 +40,13 @@ class UserController {
 
     static updateUser(req, res) {
         try {
-            const updateUserRequest = new UpdateUserRequest(req.body.nome);
+            const updateUser = new UpdateUser(req.body.nome);
             const user = usuarios.find(user => user.id === parseInt(req.params.id));
             if (!user) {
                 return res.status(404).send();
             }
 
-            user.nome = updateUserRequest.nome;
+            user.nome = updateUser.nome;
             const userResponse = new UserResponse(user);
             res.json(userResponse);
         } catch (error) {
@@ -63,4 +65,4 @@ class UserController {
     }
 }
 
-export default UserController;
+export { UserController, router };

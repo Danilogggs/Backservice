@@ -29,11 +29,16 @@
                                     "email": {
                                         "type": "string",
                                         "example": "goleirao@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "1234"
                                     }
                                 },
                                 "required": [
                                     "nome",
-                                    "email"
+                                    "email",
+                                    "password"
                                 ]
                             }
                         }
@@ -58,6 +63,10 @@
                                         "email": {
                                             "type": "string",
                                             "example": "magico@example.com"
+                                        },
+                                        "password": {
+                                            "type": "string",
+                                            "example": "senha"
                                         }
                                     }
                                 }
@@ -65,7 +74,7 @@
                         }
                     },
                     "400": {
-                        "description": "Nome e email são obrigatórios"
+                        "description": "Nome, email e senha são obrigatórios"
                     }
                 }
             },
@@ -92,12 +101,156 @@
                                             "email": {
                                                 "type": "string",
                                                 "example": "magico@example.com"
+                                            },
+                                            "password": {
+                                                "type": "string",
+                                                "example": "senha123"
                                             }
                                         }
                                     }
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/usuarios/{id}": {
+            "get": {
+                "summary": "Obter um usuário pelo ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        },
+                        "description": "ID do usuário a ser obtido"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usuário encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "nome": {
+                                            "type": "string",
+                                            "example": "Ronaldinho Gaucho"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "example": "magico@example.com"
+                                        },
+                                        "password": {
+                                            "type": "string",
+                                            "example": "senha123"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuário não encontrado"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Atualizar um usuário pelo ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        },
+                        "description": "ID do usuário a ser atualizado"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "nome": {
+                                        "type": "string",
+                                        "example": "Neymar Jr."
+                                    }
+                                },
+                                "required": [
+                                    "nome"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Usuário atualizado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "nome": {
+                                            "type": "string",
+                                            "example": "Neymar Jr."
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "example": "magico@example.com"
+                                        },
+                                        "password": {
+                                            "type": "string",
+                                            "example": "senha123"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuário não encontrado"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Deletar um usuário pelo ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        },
+                        "description": "ID do usuário a ser deletado"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Usuário deletado com sucesso"
+                    },
+                    "404": {
+                        "description": "Usuário não encontrado"
                     }
                 }
             }

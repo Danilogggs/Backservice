@@ -4,6 +4,7 @@ class UserResponse {
         this.id = user.id;
         this.nome = user.nome;
         this.email = user.email;
+        this.password = user.password;
     }
 }
 
