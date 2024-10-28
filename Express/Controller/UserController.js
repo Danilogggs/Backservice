@@ -63,6 +63,36 @@ class UserController {
         usuarios.splice(userIndex, 1);
         res.status(204).send();
     }
+
+    static addRoleToUser(req, res) {
+        const { id, roleName } = req.params;
+
+        const user = usuarios.find(user => user.id === parseInt(id));
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+
+        if (!Array.isArray(user.roles)) {
+            user.roles = [];
+        }
+
+        if (user.roles.includes(roleName)) {
+            return res.status(400).json({ error: 'Já possui role' });
+        }
+
+        user.roles.push(roleName);
+        const userResponse = new UserResponse(user);
+        res.status(200).json(userResponse);
+    }
+
 }
+
+router.post('/', UserController.createUser);
+router.get('/', UserController.listUsers);
+router.get('/:id', UserController.findUserById);
+router.put('/:id', UserController.updateUser);
+router.delete('/:id', UserController.deleteUser);
+
+router.put('/:id/roles/:roleName', UserController.addRoleToUser);
 
 export { UserController, router };

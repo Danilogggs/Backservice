@@ -1,7 +1,6 @@
-
 import User from './User.js';
 
-class CreateUserRequest {
+class CreateUser {
     constructor(nome, email, password) {
         if (!nome || !email || !password || password.length < 4) {
             throw new Error('Dados de entrada inválidos');
@@ -16,4 +15,4 @@ class CreateUserRequest {
     }
 }
 
-export default CreateUserRequest;
+export default CreateUser;

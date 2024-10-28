@@ -1,5 +1,5 @@
 
-class UpdateUserRequest {
+class UpdateUser {
     constructor(nome) {
         if (!nome) {
             throw new Error('O nome não pode estar vazio');
@@ -8,4 +8,4 @@ class UpdateUserRequest {
     }
 }
 
-export default UpdateUserRequest;
+export default UpdateUser;

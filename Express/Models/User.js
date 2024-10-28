@@ -6,11 +6,7 @@ class User {
         this.nome = nome;
         this.email = email;
         this.password = password;
-        this.roles = new Set();
-    }
-
-    addRole(role) {
-        this.roles.add(role);
+        this.roles = [];
     }
 }
 
