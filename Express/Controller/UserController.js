@@ -2,6 +2,7 @@ import CreateUser from '../Models/CreateUser.js';
 import UpdateUser from '../Models/UpdateUser.js';
 import UserResponse from '../Models/UserResponse.js';
 import express from 'express';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
 let usuarios = [];
@@ -9,14 +10,15 @@ let usuarios = [];
 class UserController {
     static createUser(req, res) {
         try {
-            const createUser = new CreateUser(req.body.nome, req.body.email, req.body.password);
+            const { nome, email, password, role } = req.body;
+            const createUser = new CreateUser(nome, email, password, role);
             const user = createUser.toUser();
-
+    
             const existingUser = usuarios.find(u => u.email === user.email);
             if (existingUser) {
                 return res.status(400).json({ error: 'Usuário já existe' });
             }
-
+    
             usuarios.push(user);
             const userResponse = new UserResponse(user);
             res.status(201).json(userResponse);
@@ -24,6 +26,7 @@ class UserController {
             res.status(400).json({ error: error.message });
         }
     }
+    
 
     static listUsers(req, res) {
         res.status(200).json(usuarios.map(user => new UserResponse(user)));
@@ -85,6 +88,22 @@ class UserController {
         res.status(200).json(userResponse);
     }
 
+    static login(req, res){
+        const {email, password} = req.body;
+
+        const user = usuarios.find(user => user.email === email && user.password === password);
+        if (!user) {
+            return res.status(401).json({ error: 'Usuário não encontrado ou senha inválida' });
+        }
+
+        const token = jwt.sign({id: user.id, email: user.email}, SECRET_KEY, {expiresIn: '1h'});
+
+        res.status(200).json({
+            message: "Login realizado",
+            token: token
+        });
+    }
+
 }
 
 router.post('/', UserController.createUser);
@@ -92,7 +111,7 @@ router.get('/', UserController.listUsers);
 router.get('/:id', UserController.findUserById);
 router.put('/:id', UserController.updateUser);
 router.delete('/:id', UserController.deleteUser);
-
 router.put('/:id/roles/:roleName', UserController.addRoleToUser);
+router.post('/login', UserController.login);
 
 export { UserController, router };

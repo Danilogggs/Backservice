@@ -63,10 +63,6 @@
                                         "email": {
                                             "type": "string",
                                             "example": "magico@example.com"
-                                        },
-                                        "password": {
-                                            "type": "string",
-                                            "example": "senha"
                                         }
                                     }
                                 }
@@ -102,9 +98,15 @@
                                                 "type": "string",
                                                 "example": "magico@example.com"
                                             },
-                                            "password": {
-                                                "type": "string",
-                                                "example": "senha123"
+                                            "roles": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                },
+                                                "example": [
+                                                    "jogadô",
+                                                    "ADMIN"
+                                                ]
                                             }
                                         }
                                     }
@@ -149,10 +151,6 @@
                                         "email": {
                                             "type": "string",
                                             "example": "magico@example.com"
-                                        },
-                                        "password": {
-                                            "type": "string",
-                                            "example": "senha123"
                                         }
                                     }
                                 }
@@ -164,7 +162,7 @@
                     }
                 }
             },
-            "put": {
+            "patch": {
                 "summary": "Atualizar um usuário pelo ID",
                 "parameters": [
                     {
@@ -216,10 +214,6 @@
                                         "email": {
                                             "type": "string",
                                             "example": "magico@example.com"
-                                        },
-                                        "password": {
-                                            "type": "string",
-                                            "example": "senha123"
                                         }
                                     }
                                 }
@@ -291,7 +285,7 @@
                 }
             },
             "get": {
-                "summary": "Lista de tdas as roles",
+                "summary": "Lista de todas as roles",
                 "responses": {
                     "200": {
                         "description": "Lista de todas as roles",
@@ -354,6 +348,74 @@
                     },
                     "404": {
                         "description": "Usuário ou role não encontrado"
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "summary": "Realizar login",
+                "description": "Autentica o usuário verificando o e-mail e a senha",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "usuario@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "senha123"
+                                    }
+                                },
+                                "required": [
+                                    "email",
+                                    "password"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login bem-sucedido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Login realizado com sucesso"
+                                        },
+                                        "token": {
+                                            "type": "string",
+                                            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Credenciais inválidas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "E-mail ou senha incorretos"
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
