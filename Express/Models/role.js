@@ -1,18 +1,9 @@
-class Role {
-    constructor(id, name, description) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-    }
-}
-
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const roleSchema = new mongoose.Schema({
     name: { type: String, required: true, unique: true },
-    description: { type: String }
-});
+    description: { type: String },
+}, { timestamps: true });
 
-module.exports = mongoose.model('Role', roleSchema);
-
+const Role = mongoose.model('Role', roleSchema);
 export default Role;

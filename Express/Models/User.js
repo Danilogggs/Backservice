@@ -1,25 +1,11 @@
-let userIdCounter = 1;
+import mongoose from 'mongoose';
 
-class User {
-    constructor(nome, email, password, roles = []) {
-        this.id = userIdCounter++;
-        this.nome = nome;
-        this.email = email;
-        this.password = password;
-        this.roles = roles;
-    }
-
-}
-
-const mongoose = require('mongoose');
-
-const usuarioSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
     nome: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    roles: { type: [String], default: [] } // Array de roles para o usuário
-});
+    roles: [{ type: String }],
+}, { timestamps: true });
 
-module.exports = mongoose.model('Usuario', usuarioSchema);
-
+const User = mongoose.model('User', userSchema);
 export default User;

@@ -1,123 +1,111 @@
-import CreateUser from '../Models/CreateUser.js';
-import UpdateUser from '../Models/UpdateUser.js';
-import UserResponse from '../Models/UserResponse.js';
-import express from 'express';
+import User from '../Models/User.js';
+import Role from '../Models/role.js';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-const router = express.Router();
-let usuarios = [];
+const SECRET_KEY = 'your_secret_key';
 
 class UserController {
-    static createUser(req, res) {
+    static async createUser(req, res) {
         try {
             const { nome, email, password, role } = req.body;
-            const createUser = new CreateUser(nome, email, password, role);
-            const user = createUser.toUser();
+            const hashedPassword = await bcrypt.hash(password, 10);
 
-            const existingUser = usuarios.find(u => u.email === user.email);
-            if (existingUser) {
-                return res.status(400).json({ error: 'Usuário já existe' });
-            }
+            const newUser = new User({
+                nome,
+                email,
+                password: hashedPassword,
+                roles: role ? [role] : [],
+            });
 
-            usuarios.push(user);
-            const userResponse = new UserResponse(user);
-            res.status(201).json(userResponse);
+            const user = await newUser.save();
+            res.status(201).json(user);
         } catch (error) {
             res.status(400).json({ error: error.message });
         }
     }
 
-
-    static listUsers(req, res) {
-        res.status(200).json(usuarios.map(user => new UserResponse(user)));
-    }
-
-    static findUserById(req, res) {
-        const user = usuarios.find(user => user.id === parseInt(req.params.id));
-        if (!user) {
-            return res.status(404).send();
-        }
-        const userResponse = new UserResponse(user);
-        res.json(userResponse);
-    }
-
-    static updateUser(req, res) {
+    static async listUsers(req, res) {
         try {
-            const user = usuarios.find(user => user.id === parseInt(req.params.id));
-            if (!user) {
-                return res.status(404).json({ error: 'Usuário não encontrado' });
-            }
-    
+            const users = await User.find();
+            res.status(200).json(users);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    static async findUserById(req, res) {
+        try {
+            const user = await User.findById(req.params.id);
+            if (!user) return res.status(404).send();
+            res.json(user);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    static async updateUser(req, res) {
+        try {
             const { nome, email, password } = req.body;
-            const updateUser = new UpdateUser({ nome, email, password });
-    
-            if (updateUser.nome !== undefined) user.nome = updateUser.nome;
-            if (updateUser.email !== undefined) user.email = updateUser.email;
-            if (updateUser.password !== undefined) user.password = updateUser.password;
-    
-            const userResponse = new UserResponse(user);
-            res.status(200).json(userResponse);
+            const updateData = { nome, email };
+            if (password) updateData.password = await bcrypt.hash(password, 10);
+
+            const user = await User.findByIdAndUpdate(req.params.id, updateData, { new: true });
+            if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+
+            res.status(200).json(user);
         } catch (error) {
             res.status(400).json({ error: error.message });
         }
     }
-    
 
-    static deleteUser(req, res) {
-        const userIndex = usuarios.findIndex(user => user.id === parseInt(req.params.id));
-        if (userIndex === -1) {
-            return res.status(404).send();
+    static async deleteUser(req, res) {
+        try {
+            const user = await User.findByIdAndDelete(req.params.id);
+            if (!user) return res.status(404).send();
+            res.status(204).send();
+        } catch (error) {
+            res.status(500).json({ error: error.message });
         }
-
-        usuarios.splice(userIndex, 1);
-        res.status(204).send();
     }
 
-    static addRoleToUser(req, res) {
-        const { id, roleName } = req.params;
+    static async addRoleToUser(req, res) {
+        try {
+            const { id, roleName } = req.params;
 
-        const user = usuarios.find(user => user.id === parseInt(id));
-        if (!user) {
-            return res.status(404).json({ error: 'Usuário não encontrado' });
+            const user = await User.findById(id);
+            if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+
+            if (!user.roles.includes(roleName)) {
+                user.roles.push(roleName);
+                await user.save();
+            } else {
+                return res.status(400).json({ error: 'Usuário já possui essa role' });
+            }
+
+            res.status(200).json(user);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
         }
-
-        if (!Array.isArray(user.roles)) {
-            user.roles = [];
-        }
-
-        if (user.roles.includes(roleName)) {
-            return res.status(400).json({ error: 'Já possui role' });
-        }
-
-        user.roles.push(roleName);
-        const userResponse = new UserResponse(user);
-        res.status(200).json(userResponse);
     }
 
-    static login(req, res) {
-        const { email, password } = req.body;
+    static async login(req, res) {
+        try {
+            const { email, password } = req.body;
 
-        const user = usuarios.find(user => user.email === email && user.password === password);
-        if (!user) {
-            return res.status(401).json({ error: 'Usuário não encontrado ou senha inválida' });
+            const user = await User.findOne({ email });
+            if (!user) return res.status(401).json({ error: 'Usuário não encontrado' });
+
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+            if (!isPasswordValid) return res.status(401).json({ error: 'Senha inválida' });
+
+            const token = jwt.sign({ id: user._id, email: user.email }, SECRET_KEY, { expiresIn: '1h' });
+
+            res.status(200).json({ message: 'Login realizado', token });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
         }
-
-        const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY, { expiresIn: '1h' });
-
-        res.status(200).json({
-            message: "Login realizado",
-            token: token
-        });
     }
-
 }
 
-router.post('/', UserController.createUser);
-router.get('/', UserController.listUsers);
-router.get('/:id', UserController.findUserById);
-router.put('/:id', UserController.updateUser);
-router.delete('/:id', UserController.deleteUser);
-router.put('/:id/roles/:roleName', UserController.addRoleToUser);
-router.post('/login', UserController.login);
-
-export { UserController, router };
+export { UserController };
