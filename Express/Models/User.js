@@ -8,18 +8,18 @@ class User {
         this.password = password;
         this.roles = roles;
     }
-
 }
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const usuarioSchema = new mongoose.Schema({
     nome: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    roles: { type: [String], default: [] } // Array de roles para o usuário
+    roles: { type: [String], default: [] }
 });
 
-module.exports = mongoose.model('Usuario', usuarioSchema);
+const Usuario = mongoose.model('Usuario', usuarioSchema);
 
-export default User;
+export default User; 
+export { Usuario }; 
